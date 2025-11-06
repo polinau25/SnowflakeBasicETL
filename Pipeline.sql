@@ -21,46 +21,46 @@ create table raw_json_data (
 // copy raw data from stage
 copy into raw_json_data
 from @initial_stage/
-FILE_FORMAT = (FORMAT_NAME = json_format);
+file_format = (format_name = json_format);
 
 // create table for parsed data
 create table results_table (
-    test_date DATE,
-    test_name VARCHAR,
-    test_value FLOAT  
+    test_date date,
+    test_name varchar,
+    test_value float  
 );
 
 // insert data from raw table to final table
-INSERT INTO results_table (test_date, test_name, test_value)
-SELECT
-    json_content:date::DATE,
-    test.value:type::VARCHAR,
-    test.value:value::FLOAT
-FROM raw_json_data,
-LATERAL FLATTEN(INPUT => json_content:tests) AS test;
+insert into results_table (test_date, test_name, test_value)
+select
+    json_content:date::date,
+    test.value:type::varchar,
+    test.value:value::float
+from raw_json_data,
+lateral flatten(input => json_content:tests) as test;
 
 // Create separate tables for fasting_glucose test
 create table fasting_glucose_table (
-    test_date DATE,
-    test_value FLOAT  
+    test_date date,
+    test_value float  
 );
 
-INSERT INTO fasting_glucose_table (test_date, test_value)
-SELECT
-    json_content:date::DATE,
-    test.value:value::FLOAT
-FROM 
+insert into fasting_glucose_table (test_date, test_value)
+select
+    json_content:date::date,
+    test.value:value::float
+from 
     raw_json_data,
-    LATERAL FLATTEN(INPUT => json_content:tests) AS test
-WHERE test.value:type = 'fasting_glucose';
+    lateral flatten(input => json_content:tests) as test
+where test.value:type = 'fasting_glucose';
 
 // Some basic queries
 
 // what was maximum value for thyroid stimulating hormone blood test
-SELECT MAX(test_value)
-FROM results_table
-WHERE test_name = 'tsh';
+select max(test_value)
+from results_table
+where test_name = 'tsh';
 
-// what is average fasting glucose level
-SELECT AVG(test_value)
-FROM fasting_glucose_table;
+// what is the average fasting glucose level
+select avg(test_value)
+from fasting_glucose_table;
