@@ -11,4 +11,4 @@ Key Objectives:
 3. Transform data into analytics tables
 4. Run queries to generate insights
 
-Small python script was used to generate json files with random blood test data.
+Small python script was used to generate json files with random blood test data. Generated files were uploaded to stage.
