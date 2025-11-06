@@ -46,3 +46,7 @@ SELECT MAX(test_value)
 FROM results_table
 WHERE test_name = 'tsh';
 
+// what is average fasting glucose level
+SELECT AVG(test_value)
+FROM results_table
+WHERE test_name = 'fasting_glucose';
