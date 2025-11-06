@@ -39,7 +39,22 @@ SELECT
 FROM raw_json_data,
 LATERAL FLATTEN(INPUT => json_content:tests) AS test;
 
-// BASIC QUERIES
+// Create separate tables for fasting_glucose test
+create table fasting_glucose_table (
+    test_date DATE,
+    test_value FLOAT  
+);
+
+INSERT INTO fasting_glucose_table (test_date, test_value)
+SELECT
+    json_content:date::DATE,
+    test.value:value::FLOAT
+FROM 
+    raw_json_data,
+    LATERAL FLATTEN(INPUT => json_content:tests) AS test
+WHERE test.value:type = 'fasting_glucose';
+
+// Some basic queries
 
 // what was maximum value for thyroid stimulating hormone blood test
 SELECT MAX(test_value)
@@ -48,5 +63,4 @@ WHERE test_name = 'tsh';
 
 // what is average fasting glucose level
 SELECT AVG(test_value)
-FROM results_table
-WHERE test_name = 'fasting_glucose';
+FROM fasting_glucose_table;
